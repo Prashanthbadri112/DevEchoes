@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useState, type ChangeEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { BACKEND_URL } from '../config';
+import { toast } from 'react-toastify';
 
 export const Auth = ({ type }: { type: 'signup' | 'signin' }) => {
   const [postInputs, setPostInputs] = useState<SignupInput>({
@@ -20,11 +21,16 @@ export const Auth = ({ type }: { type: 'signup' | 'signin' }) => {
         `${BACKEND_URL}/api/v1/user/${type === 'signup' ? 'signup' : 'signin'}`,
         payload as SigninInput | SignupInput,
       );
+      if (response.data) {
+        toast.success(`Successfully ${type === 'signup' ? 'signed up' : 'signed in'}!`);
+      }
+
+      // Store the JWT token in localStorage
       const jwt = response.data.jwt;
       localStorage.setItem('token', jwt);
       navigate('/blogs');
     } catch (err) {
-      alert(`Error during authentication ${type === 'signup' ? 'signup' : 'signin'}: ${err}`);
+      toast.error('Authentication failed try again  ');
       console.error('Error during authentication:', err);
     }
   };
